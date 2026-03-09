@@ -33,7 +33,7 @@ func doApplyMigrations(
 				migration.Name,
 				migration.Down,
 				migration.MigrationTS,
-				time.Now(),
+				time.Now().Unix(),
 			)
 
 			if err != nil {
@@ -52,6 +52,20 @@ func doApplyMigrations(
 	}
 
 	return nil
+}
+
+func MustApplyMigrations(
+	logger Logger,
+	dbmqQueries DatabaseDependentQuery,
+	db *sql.DB,
+	migrations []Migration,
+	allowDowngrades bool,
+) {
+	err := ApplyMigrations(logger, dbmqQueries, db, migrations, allowDowngrades)
+
+	if err != nil {
+		panic(err)
+	}
 }
 
 func ApplyMigrations(
@@ -110,7 +124,7 @@ func ApplyMigrations(
 			&m.Name,
 			&m.Down,
 			&m.MigrationTS,
-			&m.AppliedAt,
+			&m.AppliedAtTS,
 		)
 
 		if err != nil {

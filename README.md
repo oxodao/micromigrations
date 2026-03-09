@@ -8,7 +8,7 @@ This library is tailored at my usage so it might not fit your needs but if it do
 
 Note that there will not be much updates, not because its unmaintained, but because it is feature-complete (Except the downgrade one but I'm too lazy to implement it properly).
 
-Note that this package currently only supports SQLite but it would be quite easy to support more.
+Note that this package currently only supports SQLite and mysql/mariadb but it would be quite easy to support more.
 
 You can implement your own `DatabaseDependentQuery` struct, the only DBMS-dependent query should currently be the `FindMigrationTable` method. Do not hesitate to make a pull request if you implement one.
 
@@ -37,7 +37,7 @@ migrations := []micromigrations.Migration{
 }
 
 // And at the start of your software, right after connecting to the database, run the migrations
-err := micromigrations.ApplyMigrations(
+micromigrations.MustApplyMigrations(
     mmLogger,
     queriesAdapter,
     db,
@@ -45,10 +45,6 @@ err := micromigrations.ApplyMigrations(
     allowDowngrades,
 )
 
-// Handle the error however you want
-if err != nil {
-    panic(err)
-}
 ```
 
 ## Logger
@@ -56,6 +52,12 @@ if err != nil {
 By default, you have two Logger adapter which are NoopLogger (Does nothing, useful for tests) and GenericLogger (Simply print stuff, uses the golang's default log package).
 
 I'm using [Uber's zap](https://github.com/uber-go/zap) in my projects, you can find the adapter at [MicroMigrationsZapAdapter](https://github.com/oxodao/micromigrations-zap-adapter).
+
+## Roadmap
+
+At some point, I would like to do the following:
+- [ ] Postgres support
+- [ ] Downgrade migrations
 
 ## License
 
