@@ -143,8 +143,12 @@ func ApplyMigrations(
 
 	amtAppliedMigrations := len(appliedMigrations)
 	latestAvailableMigration := migrations[len(migrations)-1].MigrationTS
+	latestAppliedMigration := int64(0)
+	if amtAppliedMigrations > 0 {
+		latestAppliedMigration = appliedMigrations[amtAppliedMigrations-1].MigrationTS
+	}
 
-	if amtAppliedMigrations > 0 && appliedMigrations[amtAppliedMigrations-1].MigrationTS > migrations[len(migrations)-1].MigrationTS {
+	if amtAppliedMigrations > 0 && latestAppliedMigration > latestAvailableMigration {
 		logger.Warn("This database was made with a newer version of the software")
 
 		if allowDowngrades {
@@ -167,7 +171,10 @@ func ApplyMigrations(
 
 	// Filter already applied migrations and put the other in the migrations array
 	tmpMigrations := []Migration{}
-	latestMigration := appliedMigrations[amtAppliedMigrations-1].MigrationTS
+	latestMigration := migrations[0].MigrationTS
+	if amtAppliedMigrations > 0 {
+		latestMigration = latestAppliedMigration
+	}
 
 	for _, m := range migrations {
 		if m.MigrationTS > latestMigration {
